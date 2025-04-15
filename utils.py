@@ -54,35 +54,24 @@ def send_email_otp(recipient_email, otp):
 
 
 def send_sms(phone, otp):
-    from dotenv import load_dotenv
-    import os
-    load_dotenv()
-
     api_key = os.getenv("SPEEDSMS_API_KEY")
-    app_id = "APP_ID_CUA_BAN"  # ⚠️ BẮT BUỘC: lấy từ dashboard SpeedSMS
-    url = "https://api.speedsms.vn/index.php/verify/request"
+    app_id = os.getenv("SPEEDSMS_APP_ID")
 
-    headers = {
-        "Content-Type": "application/json"
-    }
+    url = "https://api.speedsms.vn/index.php/verify/request"
+    headers = { "Content-Type": "application/json" }
 
     payload = {
         "to": phone,
         "pin_code": otp,
         "content": "Mã OTP xác thực của bạn là: {pin_code}",
         "type": "sms",
+        "sender": "Verify",
         "app_id": app_id
     }
 
-    response = requests.post(
-        url,
-        json=payload,
-        headers=headers,
-        auth=(api_key, '')
-    )
-
-    print(f"[SpeedSMS VERIFY] Trạng thái: {response.status_code}")
-    print(f"[SpeedSMS VERIFY] Phản hồi: {response.text}")
+    response = requests.post(url, json=payload, headers=headers, auth=(api_key, ''))
+    print(f"[SpeedSMS] Trạng thái: {response.status_code}")
+    print(f"[SpeedSMS] Phản hồi: {response.text}")
 
 def verify_sms_token(phone, otp):
     """
