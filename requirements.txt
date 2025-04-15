@@ -1,9 +1,8 @@
 Flask
-gunicorn
 flask_sqlalchemy
 pyotp
-requests
-firebase-admin
 qrcode
+requests
 python-dotenv
-
+pymysql
+markupsafe
