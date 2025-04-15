@@ -11,7 +11,7 @@ from utils import generate_otp, get_expiration_time, send_email_otp, send_sms, v
 import os
 from dotenv import load_dotenv
 load_dotenv()
-
+from flask import request, jsonify
 
 
 
@@ -323,7 +323,7 @@ def verify_totp():
 
 
 
-
+#Hardware Token
 @bp.route('/auth/usb')
 def auth_usb():
     if 'username' not in session:
@@ -343,6 +343,15 @@ def auth_usb():
         flash("❌ Không tìm thấy USB Token. Vui lòng cắm thiết bị.", "danger")
         return redirect(url_for('main.choose_method'))
 
+@bp.route('/verify_usb_token', methods=['POST'])
+def verify_usb_token():
+    token = request.json.get("token")
+    if token == "SECRET-TOKEN-1234":
+        print("[✅] Token USB hợp lệ.")
+        return jsonify({"status": "success", "message": "Xác thực thành công!"})
+    else:
+        print("[❌] Token USB không hợp lệ.")
+        return jsonify({"status": "fail", "message": "Token không hợp lệ!"}), 403
 
 @bp.route('/home')
 def home():
