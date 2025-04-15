@@ -1,0 +1,235 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: linear-gradient(to right, #e3f2fd, #ffffff);
+  font-family: 'Poppins', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.form-container {
+  width: 100%;
+  max-width: 450px;
+  animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.form-card {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.form-card:hover {
+  transform: translateY(-3px);
+}
+
+.logo {
+  font-size: 3rem;
+  color: #007BFF;
+  margin-bottom: 1rem;
+}
+
+h2 {
+  margin-bottom: 1.5rem;
+  color: #222;
+}
+
+.input-group {
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: .5rem;
+  color: #333;
+}
+
+.input-group input {
+  width: 100%;
+  padding: .75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+.input-group input:focus {
+  border-color: #007BFF;
+  box-shadow: 0 0 0 3px rgba(0,123,255,0.15);
+  outline: none;
+}
+
+.btn {
+  background: #007BFF;
+  color: white;
+  border: none;
+  padding: .9rem 1.5rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  width: 100%;
+  margin-top: 1rem;
+  font-size: 1rem;
+  box-shadow: 0 4px 14px rgba(0, 123, 255, 0.3);
+  transition: background 0.3s, transform 0.2s;
+}
+
+.btn:hover {
+  background: #0056b3;
+  transform: translateY(-1px);
+}
+
+.link {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.link a {
+  color: #007BFF;
+  text-decoration: none;
+}
+
+.link a:hover {
+  text-decoration: underline;
+}
+
+.alert {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  text-align: left;
+  font-weight: 500;
+}
+
+.alert.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.alert.danger {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.alert.warning {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+}
+
+.qr-container {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.qr-container img {
+  width: 180px;
+  height: 180px;
+  display: block;
+  margin: auto;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.form-card ul {
+  list-style: none;
+  padding: 0;
+  text-align: left;
+}
+
+.form-card ul li {
+  margin: 10px 0;
+  font-size: 1rem;
+  padding: 10px 12px;
+  border-left: 4px solid #007BFF;
+  background: #f1f8ff;
+  border-radius: 5px;
+  transition: background 0.2s ease;
+}
+
+.form-card ul li:hover {
+  background: #e0efff;
+}
+
+.form-card ul li a {
+  text-decoration: none;
+  color: #007BFF;
+  font-weight: 500;
+}
+
+.form-card ul li a:hover {
+  text-decoration: underline;
+}
+
+
+input[type="text"] {
+  padding: 10px 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  width: 100%;
+  margin-bottom: 1rem;
+  transition: 0.2s;
+}
+
+input[type="text"]:focus {
+  border-color: #007BFF;
+  box-shadow: 0 0 0 3px rgba(0,123,255,0.2);
+  outline: none;
+}
+
+button[type="submit"] {
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+.toast-wrapper {
+  position: fixed;
+  top: 25px;
+  right: 25px;
+  z-index: 9999;
+}
+
+.toast-message {
+  background: #4caf50;
+  color: white;
+  padding: 1rem 1.5rem;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  animation: fadeInOut 4s ease-in-out;
+  font-weight: 500;
+  min-width: 260px;
+}
+
+.toast-message.success { background: #4caf50; }  /* màu xanh */
+.toast-message.danger  { background: #f44336; }  /* màu đỏ */
+.toast-message.warning { background: #ffc107; color: #333; } /* màu vàng */
+
+@keyframes fadeInOut {
+  0%   { opacity: 0; transform: translateY(-20px); }
+  10%  { opacity: 1; transform: translateY(0); }
+  90%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-20px); }
+}

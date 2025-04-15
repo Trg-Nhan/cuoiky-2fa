@@ -1,0 +1,18 @@
+code twilio: 4UTVKBZ4H2XCEF4EWY76LHK8
+code Google App Password: vyaf verk ahsb qdgy
+pass Vonage API Dashboard: 912#Aren1234
+api key: vonage:da8928ad
+api secret: fJtgKaMZxkRI114b
+
+
+ACCOUNT_SID	ACd01063ea1713b8dd6808e7c238d12b29
+AUTH_TOKEN	cb2749b8959fe49a9c7a350420f66906
+FROM_NUMBER	+84559576988    
+Service SID VA64564c952e639bff2ef5e7801b38b40d
+
+- Stringee
+API SID Key: SK.0.Ot77C1wzmEcRwyVaYIyrGBvqVf6VLkU7
+API SECRET Key: Y1NZMGpWT3hKVlBYbFFSTkRoSEowdWFhczVCaVRjVEM=
+
+-- SpeedSMS
+API KEY(API access token): RiFmd03PRHhZagsGKo3fzrn5c_1kKBz-

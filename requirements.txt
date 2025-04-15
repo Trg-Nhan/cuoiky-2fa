@@ -1,0 +1,6 @@
+Flask
+gunicorn
+flask_sqlalchemy
+pyotp
+requests
+firebase-admin

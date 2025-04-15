@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Đăng nhập</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style_modern.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="toast-wrapper">
+      {% for category, message in messages %}
+        <div class="toast-message {{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+  {% endwith %}
+
+  <div class="form-container">
+    <div class="form-card">
+      <div class="logo"><i class="fas fa-shield-alt"></i></div>
+      <h2>Đăng nhập</h2>
+      <form method="POST" action="{{ url_for('main.login') }}">
+        <div class="input-group">
+          <label for="username">Tên đăng nhập</label>
+          <input type="text" name="username" required>
+        </div>
+        <div class="input-group">
+          <label for="password">Mật khẩu</label>
+          <input type="password" name="password" required>
+        </div>
+        <button type="submit" class="btn">Đăng nhập</button>
+      </form>
+      <p class="link">Chưa có tài khoản? <a href="{{ url_for('main.switch_to_register') }}">Đăng ký ngay</a></p>
+    </div>
+  </div>
+</body>
+</html>

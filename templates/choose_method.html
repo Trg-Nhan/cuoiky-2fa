@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Chọn Phương Thức Xác Thực 2FA</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style_modern.css') }}">
+</head>
+<body>
+  
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="toast-wrapper">
+      {% for category, message in messages %}
+        <div class="toast-message {{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+  {% endwith %}
+
+  <div class="form-container">
+    <div class="form-card">
+      <h2>Chọn Phương Thức Xác Thực 2FA</h2>
+      <ul>
+        <li>📱 <a href="{{ url_for('main.auth_sms') }}">Xác thực qua SMS</a></li>
+        <li>📞 <a href="{{ url_for('main.auth_voice') }}">Xác thực qua Voice</a></li>
+        <li>🔐 <a href="{{ url_for('main.auth_totp') }}">Xác thực qua Software Token (TOTP)</a></li>
+        <li>📲 <a href="{{ url_for('main.auth_email') }}">Xác thực qua Push Notification</a></li>
+        <li>🔑 <a href="{{ url_for('main.auth_usb') }}">Xác thực qua Hardware Token</a></li>
+      </ul>
+      <div class="link">
+        <a href="{{ url_for('main.logout') }}">Đăng xuất</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
