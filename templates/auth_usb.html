@@ -1,18 +1,33 @@
-<h3>🔐 Đang chờ xác thực Hardware Token...</h3>
-<p>Vui lòng cắm USB và chạy chương trình <code>usb_auth.exe</code></p>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Xác thực Hardware Token</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_modern.css') }}">
+</head>
+<body>
+    <div class="form-container">
+        <div class="form-card">
+            <div class="logo">🔐</div>
+            <h2>Đang chờ xác thực Hardware Token...</h2>
+            <p>Vui lòng cắm USB và chạy chương trình <code>usb_auth.exe</code></p>
+            <p>Trang này sẽ tự động chuyển hướng sau khi xác thực thành công.</p>
+        </div>
+    </div>
 
-<script>
-function checkStatus() {
-  fetch("/check_usb_status")
-    .then(res => res.json())
-    .then(data => {
-      if (data.verified) {
-        window.location.href = "/home";  // ✅ Redirect nếu xác thực thành công
-      } else {
-        setTimeout(checkStatus, 2000);  // 🔁 Polling lại sau 2 giây
-      }
-    });
-}
-
-checkStatus();
-</script>
+    <script>
+        function checkStatus() {
+            fetch("/check_usb_status")
+                .then(res => res.json())
+                .then(data => {
+                    if (data.verified) {
+                        window.location.href = "/auth/usb?verified=true"; // Gọi lại route để set session
+                    } else {
+                        setTimeout(checkStatus, 2000);
+                    }
+                });
+        }
+        checkStatus();
+    </script>
+</body>
+</html>

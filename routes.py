@@ -326,12 +326,18 @@ def verify_totp():
 #Hardware Token
 @bp.route('/auth/usb')
 def auth_usb():
-    if session.get('usb_verified'):
-        session.pop('usb_verified')  # Xóa để không xác thực lại
+    if request.args.get("verified") == "true":
+        session['usb_verified'] = True
         flash("✅ Xác thực Hardware Token thành công!", "success")
         return redirect(url_for("main.home"))
-    else:
-        return render_template("auth_usb.html")
+
+    if session.get('usb_verified'):
+        session.pop('usb_verified')  # clear để không bị giữ lại
+        flash("✅ Xác thực Hardware Token thành công!", "success")
+        return redirect(url_for("main.home"))
+
+    return render_template("auth_usb.html")
+
 
 
 
@@ -340,11 +346,12 @@ def verify_usb_token():
     token = request.json.get("token")
     if token == "SECRET-TOKEN-1234":
         print("[✅] Token USB hợp lệ.")
-        session['usb_verified'] = True   # ✅ Bổ sung dòng này
-        return jsonify({"status": "success", "message": "Xác thực thành công!"})
+        # Không gán session ở đây
+        return jsonify({"status": "success", "verified": True})
     else:
         print("[❌] Token USB không hợp lệ.")
         return jsonify({"status": "fail", "message": "Token không hợp lệ!"}), 403
+
 
 @bp.route('/check_usb_status')
 def check_usb_status():
