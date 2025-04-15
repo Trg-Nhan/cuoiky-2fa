@@ -324,24 +324,6 @@ def verify_totp():
 
 
 #Hardware Token
-@bp.route('/auth/usb')
-def auth_usb():
-    if 'username' not in session:
-        return redirect(url_for('main.login'))
-
-    usb_token_path = "D:/usb_token.txt"
-    try:
-        with open(usb_token_path, "r") as f:
-            token = f.read().strip()
-        if token == "SECRET-TOKEN-1234":
-            flash("✅ Xác thực bằng USB Token thành công!", "success")
-            return redirect(url_for('main.home'))
-        else:
-            flash("❌ USB Token không hợp lệ.", "danger")
-            return redirect(url_for('main.choose_method'))
-    except FileNotFoundError:
-        flash("❌ Không tìm thấy USB Token. Vui lòng cắm thiết bị.", "danger")
-        return redirect(url_for('main.choose_method'))
 
 @bp.route('/verify_usb_token', methods=['POST'])
 def verify_usb_token():
