@@ -1,0 +1,18 @@
+<h3>🔐 Đang chờ xác thực Hardware Token...</h3>
+<p>Vui lòng cắm USB và chạy chương trình <code>usb_auth.exe</code></p>
+
+<script>
+function checkStatus() {
+  fetch("/check_usb_status")
+    .then(res => res.json())
+    .then(data => {
+      if (data.verified) {
+        window.location.href = "/home";  // ✅ Redirect nếu xác thực thành công
+      } else {
+        setTimeout(checkStatus, 2000);  // 🔁 Polling lại sau 2 giây
+      }
+    });
+}
+
+checkStatus();
+</script>
