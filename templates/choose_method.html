@@ -25,7 +25,7 @@
         <li>📞 <a href="{{ url_for('main.auth_voice') }}">Xác thực qua Voice</a></li>
         <li>🔐 <a href="{{ url_for('main.auth_totp') }}">Xác thực qua Software Token (TOTP)</a></li>
         <li>📲 <a href="{{ url_for('main.auth_email') }}">Xác thực qua Push Notification</a></li>
-        <li>🔑 <a href="{{ url_for('main.auth_usb') }}">Xác thực qua Hardware Token</a></li>
+        <li>🔑 <a href="{{ url_for('main.verify_usb_token') }}">Xác thực qua Hardware Token</a></li>
       </ul>
       <div class="link">
         <a href="{{ url_for('main.logout') }}">Đăng xuất</a>
