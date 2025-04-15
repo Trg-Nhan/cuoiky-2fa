@@ -180,9 +180,12 @@ def auth_sms():
             "Content-Type": "application/json"
         }
         payload = {
-            "to": [phone],
-            "content": f"Mã OTP của bạn là: {otp}\n@127.0.0.1 #{otp}",
-            "type": 2  # 2 = SMS OTP
+            "to": phone,
+            "pin_code": otp,
+            "content": "Mã xác thực là: {pin_code}",
+            "type": "sms",
+            "sender": "Verify",
+            "app_id": app_id
         }
 
         response = requests.post(
