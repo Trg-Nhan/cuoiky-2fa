@@ -326,7 +326,14 @@ def verify_totp():
 #Hardware Token
 @bp.route('/auth/usb')
 def auth_usb():
-    return render_template("auth_usb.html")  
+    if session.get('usb_verified'):
+        session.pop('usb_verified')  # Xóa để không xác thực lại
+        flash("✅ Xác thực Hardware Token thành công!", "success")
+        return redirect(url_for("main.home"))
+    else:
+        return render_template("auth_usb.html")
+
+
 
 @bp.route('/verify_usb_token', methods=['POST'])
 def verify_usb_token():
