@@ -332,11 +332,12 @@ def auth_usb():
         return redirect(url_for("main.home"))
 
     if session.get('usb_verified'):
-        session.pop('usb_verified')  # clear để không bị giữ lại
+        session.pop('usb_verified')
         flash("✅ Xác thực Hardware Token thành công!", "success")
         return redirect(url_for("main.home"))
 
     return render_template("auth_usb.html")
+
 
 
 
@@ -346,11 +347,11 @@ def verify_usb_token():
     token = request.json.get("token")
     if token == "SECRET-TOKEN-1234":
         print("[✅] Token USB hợp lệ.")
-        # Không gán session ở đây
         return jsonify({"status": "success", "verified": True})
     else:
         print("[❌] Token USB không hợp lệ.")
         return jsonify({"status": "fail", "message": "Token không hợp lệ!"}), 403
+
 
 
 @bp.route('/check_usb_status')
