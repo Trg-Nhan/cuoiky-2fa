@@ -9,6 +9,7 @@ import io
 import base64
 from markupsafe import Markup
 import requests
+import os
 
 
 def generate_otp():
@@ -26,8 +27,9 @@ def send_email_otp(recipient_email, otp):
     """
     smtp_server = 'smtp.gmail.com'
     smtp_port = 587
-    sender_email = 'trantrongnhan91203@gmail.com'
-    sender_password = 'vyaf verk ahsb qdgy'
+    sender_email = os.getenv("EMAIL_USER")
+    sender_password = os.getenv("EMAIL_PASSWORD")
+
 
     subject = 'Mã OTP xác thực đăng nhập'
     body = f'Mã OTP của bạn là: {otp}'
@@ -128,8 +130,11 @@ def generate_qr_code(data):
 
         
 def send_email_login_decision(recipient_email, username):
-    confirm_url = f"http://127.0.0.1:5000/verify_email_decision?user={username}&result=yes"
-    deny_url = f"http://127.0.0.1:5000/verify_email_decision?user={username}&result=no"
+    # Sử dụng biến môi trường BASE_URL, mặc định là localhost nếu chưa có
+    base_url = os.getenv("BASE_URL", "http://127.0.0.1:5000")
+    
+    confirm_url = f"{base_url}/verify_email_decision?user={username}&result=yes"
+    deny_url = f"{base_url}/verify_email_decision?user={username}&result=no"
 
     html_body = f"""
     <p>🚨 Có yêu cầu đăng nhập vào tài khoản <b>{username}</b>.</p>
@@ -140,13 +145,13 @@ def send_email_login_decision(recipient_email, username):
 
     msg = MIMEText(html_body, "html")
     msg["Subject"] = "Xác thực đăng nhập tài khoản"
-    msg["From"] = "trantrongnhan91203@gmail.com"
+    msg["From"] = os.getenv("EMAIL_USER", "no-reply@example.com")
     msg["To"] = recipient_email
 
     try:
         server = smtplib.SMTP("smtp.gmail.com", 587)
         server.starttls()
-        server.login("trantrongnhan91203@gmail.com", "vyaf verk ahsb qdgy")
+        server.login(os.getenv("EMAIL_USER"), os.getenv("EMAIL_PASSWORD"))
         server.send_message(msg)
         server.quit()
         print(f"[EMAIL] Gửi link xác thực đến {recipient_email}")
