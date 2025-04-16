@@ -1,6 +1,6 @@
-// static/firebase.js
+// firebase.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js";
+import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDOR6ivLePyTR4j3HlHMyN-NB6QS-qSORk",
@@ -8,28 +8,37 @@ const firebaseConfig = {
   projectId: "sms-auth-demo-f5b14",
   storageBucket: "sms-auth-demo-f5b14.firebasestorage.app",
   messagingSenderId: "194704028483",
-  appId: "1:194704028483:web:4c402376687e955bcbf5f6"
+  appId: "1:194704028483:web:4c402376687e955bcbf5f6",
+  measurementId: "G-DEV70ZFQLW"
 };
 
 const app = initializeApp(firebaseConfig);
-const messaging = getMessaging(app);
+const auth = getAuth(app);
 
-Notification.requestPermission().then((permission) => {
-  if (permission === "granted") {
-    getToken(messaging, { vapidKey: "BCZfklmHxRLiCAi2vZSGA13yTWTcy2Il_HWqueR1RjGVCmwxhPA-NwTNNZoq0KF9C_hFroM8HrL1BXT5Pz8Ppdw" }).then((currentToken) => {
-      if (currentToken) {
-        console.log("Token:", currentToken);
-        fetch("/save_push_token", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token: currentToken })
-        });
-      }
+window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
+  'size': 'invisible'
+}, auth);
+
+// Hàm gửi OTP
+window.sendOtpFirebase = function(phoneNumber) {
+  signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier)
+    .then((confirmationResult) => {
+      window.confirmationResult = confirmationResult;
+      alert("Mã OTP đã được gửi!");
+    })
+    .catch((error) => {
+      alert("Lỗi gửi OTP: " + error.message);
     });
-  }
-});
+};
 
-onMessage(messaging, (payload) => {
-  console.log("Push received:", payload);
-  alert(payload.notification.title + ": " + payload.notification.body);
-});
+// Hàm xác minh OTP
+window.submitOtpFirebase = function() {
+  const code = document.getElementById("otp").value;
+  window.confirmationResult.confirm(code)
+    .then((result) => {
+      document.getElementById("otp-form").submit();
+    })
+    .catch((error) => {
+      alert("Mã OTP không đúng hoặc đã hết hạn");
+    });
+};

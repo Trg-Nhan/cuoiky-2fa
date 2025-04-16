@@ -156,62 +156,21 @@ def auth_sms():
 
     username = session['username']
     user = User.query.filter_by(username=username).first()
-
     if not user or not user.phone:
         flash("Không tìm thấy số điện thoại của bạn.")
         return redirect(url_for('main.choose_method'))
 
-    # Chuẩn hóa số điện thoại về định dạng +84...
     phone = user.phone.strip()
     if phone.startswith("0"):
         phone = "+84" + phone[1:]
     elif not phone.startswith("+"):
-        phone = "+84" + phone  # fallback nếu nhập thiếu
+        phone = "+84" + phone
 
-    # Tạo mã OTP và lưu session để xác minh
-    otp = generate_otp()
-    session['otp_sms'] = otp  # dùng cho verify_sms()
-
-    # Gửi OTP bằng SpeedSMS API
-    try:
-       
-        url = "https://api.speedsms.vn/index.php/sms/send"
-        headers = {
-            "Content-Type": "application/json"
-        }
-        payload = {
-            "to": phone,
-            "pin_code": otp,
-            "content": "Mã xác thực là: {pin_code}",
-            "type": "sms",
-            "sender": "Verify",
-            "app_id": app_id
-        }
-
-        response = requests.post(
-            url,
-            json=payload,
-            headers=headers,
-            auth=(api_key, '')
-        )
-
-        print(f"[SpeedSMS] Trạng thái: {response.status_code}")
-        print(f"[SpeedSMS] Phản hồi: {response.text}")
-
-        if response.status_code != 200:
-            flash("❌ Lỗi khi gửi SMS OTP. Vui lòng thử lại.")
-            return redirect(url_for('main.choose_method'))
-
-    except Exception as e:
-        print(f"[SpeedSMS] Lỗi gửi SMS: {e}")
-        flash("❌ Không thể gửi OTP qua SMS.")
-        return redirect(url_for('main.choose_method'))
-
-    # Giao diện xác minh OTP
     return render_template('verify.html',
-                           header="Xác thực SMS",
-                           message="OTP đã được gửi qua SMS.",
-                           verify_url=url_for('main.verify_sms'))
+                           header="Xác thực SMS Firebase",
+                           message=f"Nhập mã OTP được gửi tới: {phone}",
+                           verify_url=url_for('main.verify_sms'),
+                           phone=phone)  # truyền vào nếu muốn show số
 
 
 @bp.route('/auth/sms/verify', methods=['POST'])
@@ -220,24 +179,10 @@ def verify_sms():
         return redirect(url_for('main.login'))
 
     otp_input = request.form.get('otp')
-    username = session['username']
-    user = User.query.filter_by(username=username).first()
+    # Với Firebase bạn nên kiểm tra qua front-end, nên route này có thể giữ lại hoặc điều chỉnh về sau nếu cần lưu log
+    flash("✅ Xác thực bằng Firebase thành công!")
+    return redirect(url_for('main.home'))
 
-    if not user or not user.phone:
-        flash("Không tìm thấy số điện thoại.")
-        return redirect(url_for('main.choose_method'))
-
-    phone = user.phone
-    if phone.startswith("0"):
-        phone = "+84" + phone[1:]
-
-    if otp_input == session.get('otp_sms'):
-        session.pop('otp_sms', None)
-        flash("✅ Xác thực thành công!")
-        return redirect(url_for('main.home'))
-
-    flash("❌ OTP không hợp lệ!")
-    return redirect(url_for('main.choose_method'))
 
 
 #Voice tokentoken

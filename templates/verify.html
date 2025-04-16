@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <title>{{ header }}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  {% if header == "Xác thực SMS" %}
+  {% if header == "Xác thực SMS Firebase" %}
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
-    <script src="{{ url_for('static', filename='firebase.js') }}"></script>
+    <script src="{{ url_for('static', filename='firebase.js') }}" type="module"></script>
   {% endif %}
 </head>
 <body {% if header == "Xác thực Voice" %}onload="speakOTP();"{% endif %}>
@@ -41,12 +41,16 @@
       {% endif %}
 
       {% if verify_url != "#" %}
-        <form method="POST" action="{{ verify_url }}">
+        <form id="otp-form" method="POST" action="{{ verify_url }}">
           <div class="input-group">
             <label for="otp">Nhập OTP:</label>
             <input type="text" id="otp" name="otp" required>
           </div>
-          <button type="submit" class="btn">Xác thực</button>
+          {% if header == "Xác thực SMS Firebase" %}
+            <button type="button" class="btn" onclick="submitOtpFirebase()">Xác minh Firebase</button>
+          {% else %}
+            <button type="submit" class="btn">Xác thực</button>
+          {% endif %}
         </form>
       {% endif %}
 
@@ -66,6 +70,15 @@
       window.speechSynthesis.speak(msg);
     }
   </script>
+  {% endif %}
+
+  {% if header == "Xác thực SMS Firebase" %}
+    <div id="recaptcha-container"></div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        sendOtpFirebase("{{ phone }}");
+      });
+    </script>
   {% endif %}
 </body>
 </html>
