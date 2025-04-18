@@ -4,10 +4,12 @@
   <meta charset="UTF-8">
   <title>{{ header }}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
   {% if header == "Xác thực SMS Firebase" %}
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
-    <script src="{{ url_for('static', filename='firebase.js') }}" type="module"></script>
+    <!-- Firebase SDK compat version -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="{{ url_for('static', filename='firebase.js') }}"></script>
   {% endif %}
 </head>
 <body {% if header == "Xác thực Voice" %}onload="speakOTP();"{% endif %}>
@@ -17,11 +19,11 @@
       <h2>{{ header }}</h2>
 
       {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert {{ category }}">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert {{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
       {% endwith %}
 
       <p style="margin-bottom: 1rem;">

@@ -1,7 +1,6 @@
 // firebase.js
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
+// Sử dụng Firebase SDK dạng compat (không cần import module)
 const firebaseConfig = {
   apiKey: "AIzaSyDOR6ivLePyTR4j3HlHMyN-NB6QS-qSORk",
   authDomain: "sms-auth-demo-f5b14.firebaseapp.com",
@@ -12,33 +11,44 @@ const firebaseConfig = {
   measurementId: "G-DEV70ZFQLW"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
 
-window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
-  'size': 'invisible'
-}, auth);
+// Tạo invisible reCAPTCHA
+window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+  size: 'invisible',
+  callback: function(response) {
+    console.log("reCAPTCHA passed", response);
+  }
+});
 
 // Hàm gửi OTP
-window.sendOtpFirebase = function(phoneNumber) {
-  signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier)
+function sendOtpFirebase(phoneNumber) {
+  auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
     .then((confirmationResult) => {
       window.confirmationResult = confirmationResult;
-      alert("Mã OTP đã được gửi!");
+      alert("Mã OTP đã được gửi đến số điện thoại của bạn!");
     })
     .catch((error) => {
+      console.error("Lỗi gửi OTP:", error);
       alert("Lỗi gửi OTP: " + error.message);
     });
-};
+}
 
-// Hàm xác minh OTP
-window.submitOtpFirebase = function() {
+// Hàm xác minh OTP và submit
+function submitOtpFirebase() {
   const code = document.getElementById("otp").value;
+  if (!window.confirmationResult) {
+    alert("Chưa có mã xác nhận từ Firebase. Hãy thử lại.");
+    return;
+  }
   window.confirmationResult.confirm(code)
     .then((result) => {
+      alert("✅ Xác thực thành công!");
       document.getElementById("otp-form").submit();
     })
     .catch((error) => {
-      alert("Mã OTP không đúng hoặc đã hết hạn");
+      console.error("Lỗi xác minh OTP:", error);
+      alert("❌ Mã OTP không đúng hoặc đã hết hạn.");
     });
-};
+}
