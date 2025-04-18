@@ -1,75 +1,78 @@
-// Cấu hình Firebase
+// firebase.js
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+
 const firebaseConfig = {
   apiKey: "AIzaSyD0R6ivLePyTR4j3HlHMyN-NB6QS-qSORk",
   authDomain: "sms-auth-demo-f5b14.firebaseapp.com",
   projectId: "sms-auth-demo-f5b14",
   storageBucket: "sms-auth-demo-f5b14.appspot.com",
-  messagingSenderId: "438147369507",
-  appId: "1:438147369507:web:4c402376687e955bcbf5f6"
+  messagingSenderId: "678811841630",
+  appId: "1:678811841630:web:4c402376687e955bbcf5f6"
 };
 
-// Khởi tạo Firebase
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
 let confirmationResult = null;
+let timerInterval;
 
-// Gửi OTP khi trang tải
-function sendOtpFirebase(phoneNumber) {
-  const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-    'size': 'invisible'
-  });
+window.sendOtpFirebase = function (phoneNumber) {
+  const recaptchaContainer = document.getElementById("recaptcha-container");
+  recaptchaContainer.innerHTML = "";
 
-  auth.signInWithPhoneNumber(phoneNumber, appVerifier)
+  const recaptchaVerifier = new RecaptchaVerifier("recaptcha-container", {
+    size: "invisible"
+  }, auth);
+
+  signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier)
     .then((result) => {
       confirmationResult = result;
-      console.log("OTP đã được gửi.");
+      alert("✅ Đã gửi mã OTP thành công!");
+      startCountdown();
     })
     .catch((error) => {
-      console.error("Lỗi gửi OTP:", error.message);
-      alert("Lỗi gửi OTP: " + error.message);
+      console.error("Lỗi gửi OTP:", error);
+      alert("❌ Lỗi gửi OTP: " + error.message);
     });
-}
+};
 
-// Hàm gửi lại mã OTP
-function resendOtp() {
-  const phone = "{{ phone }}"; // biến Flask sẽ không hoạt động trong JS file riêng → bạn có thể set nó trong HTML script block
-  sendOtpFirebase(phone);
+window.submitOtpFirebase = function () {
+  const otp = document.getElementById("otp").value;
+  if (!otp || !confirmationResult) {
+    alert("❌ Vui lòng nhập mã OTP hợp lệ.");
+    return;
+  }
+  confirmationResult.confirm(otp)
+    .then(() => {
+      window.location.href = "/auth/success";
+    })
+    .catch((error) => {
+      console.error("Lỗi xác minh OTP:", error);
+      alert("❌ Mã OTP không đúng hoặc đã hết hạn.");
+    });
+};
 
-  // Reset countdown
-  const resendBtn = document.getElementById("resendBtn");
-  const timerEl = document.getElementById("timer");
+window.resendOtp = function () {
+  const resendBtn = document.getElementById("resend-btn");
+  const phoneNumber = resendBtn.dataset.phone;
+  if (!phoneNumber) return;
+  sendOtpFirebase(phoneNumber);
+};
+
+function startCountdown() {
+  const resendBtn = document.getElementById("resend-btn");
+  let timeLeft = 30;
   resendBtn.disabled = true;
-  let countdown = 30;
-  timerEl.innerText = `(${countdown}s)`;
-  const interval = setInterval(() => {
-    countdown--;
-    timerEl.innerText = `(${countdown}s)`;
-    if (countdown <= 0) {
-      clearInterval(interval);
-      timerEl.innerText = "";
+  resendBtn.innerText = `Gửi lại mã (${timeLeft}s)`;
+
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    resendBtn.innerText = `Gửi lại mã (${timeLeft}s)`;
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      resendBtn.innerText = "Gửi lại mã";
       resendBtn.disabled = false;
     }
   }, 1000);
-}
-
-// Gửi mã OTP người dùng nhập
-function submitOtpFirebase() {
-  const code = document.getElementById("otp").value;
-  if (!confirmationResult) {
-    alert("Không có yêu cầu xác thực nào đang chờ.");
-    return;
-  }
-
-  confirmationResult.confirm(code)
-    .then((result) => {
-      // Xác thực thành công
-      console.log("Xác thực thành công:", result.user.phoneNumber);
-      alert("✅ Xác thực thành công!");
-      window.location.href = "/auth/success"; // Chuyển trang sau khi xác thực
-    })
-    .catch((error) => {
-      console.error("Lỗi xác thực:", error.message);
-      alert("❌ Mã OTP không chính xác hoặc đã hết hạn.");
-    });
 }
