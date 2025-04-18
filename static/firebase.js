@@ -1,11 +1,11 @@
-// firebase.js
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_BUCKET",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDOR6ivLePyTR4j3HlHMyN-NB6QS-qSORk",
+  authDomain: "sms-auth-demo-f5b14.firebaseapp.com",
+  projectId: "sms-auth-demo-f5b14",
+  storageBucket: "sms-auth-demo-f5b14.firebasestorage.app",
+  messagingSenderId: "194704028483",
+  appId: "1:194704028483:web:4c402376687e955bcbf5f6",
+  measurementId: "G-DEV70ZFQLW"
 };
 
 firebase.initializeApp(firebaseConfig);
