@@ -10,21 +10,19 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
-
 let confirmationResult = null;
+let countdownTimer = null;
 
 window.sendOtpFirebase = function (phoneNumber) {
   const recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-    size: 'invisible',
-    callback: function(response) {
-      // recaptcha solved
-    }
+    size: 'invisible'
   });
 
   auth.signInWithPhoneNumber(phoneNumber, recaptchaVerifier)
     .then((result) => {
       confirmationResult = result;
       alert("✅ Mã OTP đã được gửi!");
+      startResendCountdown();
     })
     .catch((error) => {
       alert("❌ Lỗi gửi OTP: " + error.message);
@@ -39,11 +37,35 @@ window.submitOtpFirebase = function () {
   }
 
   confirmationResult.confirm(code)
-    .then((result) => {
+    .then(() => {
       alert("✅ Xác minh OTP thành công!");
-      window.location.href = "/auth/sms"; // hoặc redirect tùy bạn
+      window.location.href = "/home";  // ✅ Sửa lại để chuyển đúng
     })
     .catch((error) => {
       alert("❌ Sai mã OTP: " + error.message);
     });
 };
+
+window.resendOtp = function () {
+  const phone = "{{ phone }}";
+  sendOtpFirebase(phone);
+  startResendCountdown();
+};
+
+function startResendCountdown() {
+  const btn = document.getElementById("resend-btn");
+  let countdown = 60;
+  btn.disabled = true;
+  btn.textContent = `Gửi lại mã (${countdown}s)`;
+
+  countdownTimer = setInterval(() => {
+    countdown--;
+    btn.textContent = `Gửi lại mã (${countdown}s)`;
+
+    if (countdown === 0) {
+      clearInterval(countdownTimer);
+      btn.disabled = false;
+      btn.textContent = "Gửi lại mã";
+    }
+  }, 1000);
+}

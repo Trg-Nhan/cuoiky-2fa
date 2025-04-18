@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Xác thực SMS</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style_modern.css') }}">
 
-  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="{{ url_for('static', filename='firebase.js') }}"></script>
@@ -13,20 +12,22 @@
 <body>
   <div class="form-container">
     <div class="form-card">
+      <div class="logo"><i class="fas fa-key"></i></div>
       <h2>Xác thực SMS</h2>
-      <p>Nhập mã OTP được gửi tới: <strong>{{ phone }}</strong></p>
+      <p>Mã OTP đã được gửi đến số <strong>{{ phone }}</strong></p>
 
-      <form id="otp-form" method="POST" action="{{ verify_url }}">
+      <form id="otp-form">
         <div class="input-group">
-          <label for="otp">Nhập OTP:</label>
+          <label for="otp">Nhập mã OTP:</label>
           <input type="text" id="otp" name="otp" required>
         </div>
         <button type="button" class="btn" onclick="submitOtpFirebase()">Xác minh</button>
+        <button id="resend-btn" type="button" onclick="resendOtp()" disabled>Gửi lại mã (60s)</button>
       </form>
 
       <div id="recaptcha-container"></div>
 
-      <div style="margin-top: 1rem;">
+      <div class="link">
         <a href="{{ url_for('main.choose_method') }}">← Quay lại chọn phương thức</a>
       </div>
     </div>
@@ -35,6 +36,7 @@
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       sendOtpFirebase("{{ phone }}");
+      startResendCountdown();
     });
   </script>
 </body>
