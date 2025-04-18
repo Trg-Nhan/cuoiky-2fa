@@ -13,6 +13,12 @@
   {% endif %}
 </head>
 <body {% if header == "Xác thực Voice" %}onload="speakOTP();"{% endif %}>
+
+  {% if header == "Xác thực SMS Firebase" %}
+    <!-- Thêm thẻ ẩn chứa số điện thoại để JS đọc -->
+    <span id="phoneNumber" style="display: none;">{{ phone }}</span>
+  {% endif %}
+
   <div class="form-container">
     <div class="form-card">
       <div class="logo"><i class="fas fa-key"></i></div>
@@ -78,7 +84,7 @@
     <div id="recaptcha-container"></div>
     <script>
       document.addEventListener("DOMContentLoaded", function() {
-        sendOtpFirebase("{{ phone }}");
+        sendOtpFirebase();  // Lấy số từ #phoneNumber, không truyền trực tiếp
       });
     </script>
   {% endif %}
