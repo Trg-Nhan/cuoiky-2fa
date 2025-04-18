@@ -5,8 +5,7 @@
   <title>{{ header }}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-  {% if header == "Xác thực SMS Firebase" %}
-    <!-- Firebase SDK compat version -->
+  {% if header == "Xác thực SMS" %}
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
     <script src="{{ url_for('static', filename='firebase.js') }}"></script>
@@ -14,8 +13,7 @@
 </head>
 <body {% if header == "Xác thực Voice" %}onload="speakOTP();"{% endif %}>
 
-  {% if header == "Xác thực SMS " %}
-    <!-- Thêm thẻ ẩn chứa số điện thoại để JS đọc -->
+  {% if header == "Xác thực SMS" %}
     <span id="phoneNumber" style="display: none;">{{ phone }}</span>
   {% endif %}
 
@@ -54,8 +52,8 @@
             <label for="otp">Nhập OTP:</label>
             <input type="text" id="otp" name="otp" required>
           </div>
-          {% if header == "Xác thực SMS " %}
-            <button type="button" class="btn" onclick="submitOtpFirebase()">Xác minh Firebase</button>
+          {% if header == "Xác thực SMS" %}
+            <button type="button" class="btn" onclick="submitOtpFirebase()">Xác minh</button>
             <button type="button" class="btn resend-btn" style="margin-top: 0.5rem;" onclick="resendOtp()">Gửi lại mã</button>
           {% else %}
             <button type="submit" class="btn">Xác thực</button>
@@ -81,14 +79,14 @@
   </script>
   {% endif %}
 
-  {% if header == "Xác thực SMS " %}
+  {% if header == "Xác thực SMS" %}
     <div id="recaptcha-container"></div>
     <script>
       document.addEventListener("DOMContentLoaded", function() {
-        sendOtpFirebase();  // Lấy số từ #phoneNumber, không truyền trực tiếp
+        const phone = document.getElementById("phoneNumber")?.innerText;
+        if (phone) sendOtpFirebase(phone);
       });
     </script>
   {% endif %}
-  
 </body>
 </html>
