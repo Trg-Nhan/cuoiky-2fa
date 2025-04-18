@@ -2,88 +2,40 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>{{ header }}</title>
+  <title>Xác thực SMS</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-  {% if header == "Xác thực SMS" %}
-    <!-- Firebase SDK compat version -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-    <script src="{{ url_for('static', filename='js/firebase.js') }}"></script>
-  {% endif %}
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="{{ url_for('static', filename='firebase.js') }}"></script>
 </head>
-<body {% if header == "Xác thực Voice" %}onload="speakOTP();"{% endif %}>
+<body>
   <div class="form-container">
     <div class="form-card">
-      <div class="logo"><i class="fas fa-key"></i></div>
-      <h2>{{ header }}</h2>
+      <h2>Xác thực SMS</h2>
+      <p>Nhập mã OTP được gửi tới: <strong>{{ phone }}</strong></p>
 
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-          {% for category, message in messages %}
-            <div class="alert {{ category }}">{{ message }}</div>
-          {% endfor %}
-        {% endif %}
-      {% endwith %}
-
-      <p style="margin-bottom: 1rem;">
-        {{ message|safe }}
-        {% if otp_to_speak %}
-          <button type="button" onclick="speakOTP()" title="Nghe lại mã OTP"
-                  style="margin-left: 10px; background: none; border: none; cursor: pointer; font-size: 1.3rem;">
-            🔊
-          </button>
-        {% endif %}
-      </p>
-
-      {% if qr_code %}
-        <div class="qr-container">
-          {{ qr_code|safe }}
+      <form id="otp-form" method="POST" action="{{ verify_url }}">
+        <div class="input-group">
+          <label for="otp">Nhập OTP:</label>
+          <input type="text" id="otp" name="otp" required>
         </div>
-      {% endif %}
+        <button type="button" class="btn" onclick="submitOtpFirebase()">Xác minh</button>
+      </form>
 
-      {% if verify_url != "#" %}
-        <form id="otp-form" method="POST" action="{{ verify_url }}">
-          <div class="input-group">
-            <label for="otp">Nhập OTP:</label>
-            <input type="text" id="otp" name="otp" required>
-          </div>
+      <div id="recaptcha-container"></div>
 
-          {% if header == "Xác thực SMS" %}
-            <button type="button" class="btn" onclick="submitOtpFirebase()">Xác thực</button>
-            <button type="button" class="btn" id="resend-btn" style="margin-top: 1rem;" onclick="resendOtp()">Gửi lại mã</button>
-          {% else %}
-            <button type="submit" class="btn">Xác thực</button>
-          {% endif %}
-        </form>
-      {% endif %}
-
-      <div class="link" style="margin-top: 1.5rem;">
+      <div style="margin-top: 1rem;">
         <a href="{{ url_for('main.choose_method') }}">← Quay lại chọn phương thức</a>
       </div>
     </div>
   </div>
 
-  {% if header == "Xác thực Voice" and otp_to_speak %}
   <script>
-    function speakOTP() {
-      const otp = "{{ otp_to_speak }}".split('').join(', ');
-      const msg = new SpeechSynthesisUtterance("Mã xác thực của bạn là: " + otp);
-      msg.lang = 'vi-VN';
-      msg.rate = 0.8;
-      window.speechSynthesis.speak(msg);
-    }
+    document.addEventListener("DOMContentLoaded", function () {
+      sendOtpFirebase("{{ phone }}");
+    });
   </script>
-  {% endif %}
-
-  {% if header == "Xác thực SMS" %}
-    <div id="recaptcha-container"></div>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const phone = "{{ phone }}";
-        if (phone) sendOtpFirebase(phone);
-      });
-    </script>
-  {% endif %}
 </body>
 </html>
