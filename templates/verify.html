@@ -6,9 +6,10 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
   {% if header == "Xác thực SMS" %}
+    <!-- Firebase SDK compat version -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-    <script src="{{ url_for('static', filename='firebase.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/firebase.js') }}"></script>
   {% endif %}
 </head>
 <body {% if header == "Xác thực Voice" %}onload="speakOTP();"{% endif %}>
@@ -49,12 +50,8 @@
           </div>
 
           {% if header == "Xác thực SMS" %}
-            <div class="button-group" style="margin-top: 1rem;">
-              <button type="button" class="btn" onclick="submitOtpFirebase()">Xác thực</button>
-              <button id="resend-btn" class="btn secondary" data-phone="{{ phone }}" onclick="resendOtp()" disabled>
-                Gửi lại mã (<span id="resend-timer">30</span>s)
-              </button>
-            </div>
+            <button type="button" class="btn" onclick="submitOtpFirebase()">Xác thực</button>
+            <button type="button" class="btn" id="resend-btn" style="margin-top: 1rem;" onclick="resendOtp()">Gửi lại mã</button>
           {% else %}
             <button type="submit" class="btn">Xác thực</button>
           {% endif %}
@@ -82,24 +79,9 @@
   {% if header == "Xác thực SMS" %}
     <div id="recaptcha-container"></div>
     <script>
-      document.addEventListener("DOMContentLoaded", function() {
-        sendOtpFirebase("{{ phone }}");
-
-        let timeLeft = 30;
-        const resendBtn = document.getElementById("resend-btn");
-        const timer = document.getElementById("resend-timer");
-        resendBtn.disabled = true;
-        timer.innerText = timeLeft;
-
-        const countdown = setInterval(() => {
-          timeLeft--;
-          timer.innerText = timeLeft;
-          if (timeLeft <= 0) {
-            clearInterval(countdown);
-            resendBtn.disabled = false;
-            timer.innerText = "";
-          }
-        }, 1000);
+      document.addEventListener("DOMContentLoaded", function () {
+        const phone = "{{ phone }}";
+        if (phone) sendOtpFirebase(phone);
       });
     </script>
   {% endif %}
