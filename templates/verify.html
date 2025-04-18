@@ -4,19 +4,11 @@
   <meta charset="UTF-8">
   <title>{{ header }}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-
-  {% if header == "Xác thực SMS" %}
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-    <script src="{{ url_for('static', filename='firebase.js') }}"></script>
-  {% endif %}
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="{{ url_for('static', filename='firebase.js') }}"></script>
 </head>
 <body {% if header == "Xác thực Voice" %}onload="speakOTP();"{% endif %}>
-
-  {% if header == "Xác thực SMS" %}
-    <span id="phoneNumber" style="display: none;">{{ phone }}</span>
-  {% endif %}
-
   <div class="form-container">
     <div class="form-card">
       <div class="logo"><i class="fas fa-key"></i></div>
@@ -54,7 +46,9 @@
           </div>
           {% if header == "Xác thực SMS" %}
             <button type="button" class="btn" onclick="submitOtpFirebase()">Xác minh</button>
-            <button type="button" class="btn resend-btn" style="margin-top: 0.5rem;" onclick="resendOtp()">Gửi lại mã</button>
+            <button type="button" class="btn resend-btn" style="margin-top: 0.5rem;" onclick="resendOtp()" id="resendBtn">
+              Gửi lại mã <span id="timer"></span>
+            </button>
           {% else %}
             <button type="submit" class="btn">Xác thực</button>
           {% endif %}
@@ -82,9 +76,31 @@
   {% if header == "Xác thực SMS" %}
     <div id="recaptcha-container"></div>
     <script>
+      function startCountdown(seconds) {
+        const timerSpan = document.getElementById("timer");
+        const resendBtn = document.getElementById("resendBtn");
+        resendBtn.disabled = true;
+
+        let countdown = setInterval(() => {
+          seconds--;
+          timerSpan.textContent = `(${seconds}s)`;
+
+          if (seconds <= 0) {
+            clearInterval(countdown);
+            resendBtn.disabled = false;
+            timerSpan.textContent = '';
+          }
+        }, 1000);
+      }
+
+      function resendOtp() {
+        sendOtpFirebase("{{ phone }}");
+        startCountdown(30);
+      }
+
       document.addEventListener("DOMContentLoaded", function() {
-        const phone = document.getElementById("phoneNumber")?.innerText;
-        if (phone) sendOtpFirebase(phone);
+        sendOtpFirebase("{{ phone }}");
+        startCountdown(30);
       });
     </script>
   {% endif %}
