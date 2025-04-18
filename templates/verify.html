@@ -76,31 +76,23 @@
   {% if header == "Xác thực SMS" %}
     <div id="recaptcha-container"></div>
     <script>
-      function startCountdown(seconds) {
-        const timerSpan = document.getElementById("timer");
+      document.addEventListener("DOMContentLoaded", function() {
+        sendOtpFirebase("{{ phone }}");
+
+        // Countdown
+        let countdown = 30;
+        const timerEl = document.getElementById("timer");
         const resendBtn = document.getElementById("resendBtn");
         resendBtn.disabled = true;
 
-        let countdown = setInterval(() => {
-          seconds--;
-          timerSpan.textContent = `(${seconds}s)`;
-
-          if (seconds <= 0) {
-            clearInterval(countdown);
+        const interval = setInterval(() => {
+          timerEl.innerText = `(${countdown--}s)`;
+          if (countdown < 0) {
+            clearInterval(interval);
+            timerEl.innerText = "";
             resendBtn.disabled = false;
-            timerSpan.textContent = '';
           }
         }, 1000);
-      }
-
-      function resendOtp() {
-        sendOtpFirebase("{{ phone }}");
-        startCountdown(30);
-      }
-
-      document.addEventListener("DOMContentLoaded", function() {
-        sendOtpFirebase("{{ phone }}");
-        startCountdown(30);
       });
     </script>
   {% endif %}
