@@ -14,7 +14,7 @@
 </head>
 <body {% if header == "Xác thực Voice" %}onload="speakOTP();"{% endif %}>
 
-  {% if header == "Xác thực SMS Firebase" %}
+  {% if header == "Xác thực SMS " %}
     <!-- Thêm thẻ ẩn chứa số điện thoại để JS đọc -->
     <span id="phoneNumber" style="display: none;">{{ phone }}</span>
   {% endif %}
@@ -54,8 +54,9 @@
             <label for="otp">Nhập OTP:</label>
             <input type="text" id="otp" name="otp" required>
           </div>
-          {% if header == "Xác thực SMS Firebase" %}
+          {% if header == "Xác thực SMS " %}
             <button type="button" class="btn" onclick="submitOtpFirebase()">Xác minh Firebase</button>
+            <button type="button" class="btn resend-btn" style="margin-top: 0.5rem;" onclick="resendOtp()">Gửi lại mã</button>
           {% else %}
             <button type="submit" class="btn">Xác thực</button>
           {% endif %}
@@ -80,7 +81,7 @@
   </script>
   {% endif %}
 
-  {% if header == "Xác thực SMS Firebase" %}
+  {% if header == "Xác thực SMS " %}
     <div id="recaptcha-container"></div>
     <script>
       document.addEventListener("DOMContentLoaded", function() {
@@ -88,5 +89,6 @@
       });
     </script>
   {% endif %}
+  
 </body>
 </html>
