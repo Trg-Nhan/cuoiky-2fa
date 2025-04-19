@@ -2,7 +2,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyDOR6ivLePyTR4j3HlHMyN-NB6QS-qSORk",
   authDomain: "sms-auth-demo-f5b14.firebaseapp.com",
   projectId: "sms-auth-demo-f5b14",
-  storageBucket: "sms-auth-demo-f5b14.firebasestorage.app",
+  storageBucket: "sms-auth-demo-f5b14.appspot.com",
   messagingSenderId: "194704028483",
   appId: "1:194704028483:web:4c402376687e955bcbf5f6",
   measurementId: "G-DEV70ZFQLW"
@@ -13,12 +13,24 @@ const auth = firebase.auth();
 let confirmationResult = null;
 let countdownTimer = null;
 
-window.sendOtpFirebase = function (phoneNumber) {
-  const recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-    size: 'invisible'
-  });
+// ⚠️ Bắt buộc HTML phải có: <div id="recaptcha-container"></div>
+function initRecaptcha() {
+  if (!window.recaptchaVerifier) {
+    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+      size: 'invisible',
+      callback: function (response) {
+        console.log("reCAPTCHA resolved:", response);
+      }
+    });
+    window.recaptchaVerifier.render();
+  }
+}
 
-  auth.signInWithPhoneNumber(phoneNumber, recaptchaVerifier)
+window.sendOtpFirebase = function (phoneNumber) {
+  initRecaptcha();
+  const appVerifier = window.recaptchaVerifier;
+
+  auth.signInWithPhoneNumber(phoneNumber, appVerifier)
     .then((result) => {
       confirmationResult = result;
       alert("✅ Mã OTP đã được gửi!");
@@ -26,6 +38,7 @@ window.sendOtpFirebase = function (phoneNumber) {
     })
     .catch((error) => {
       alert("❌ Lỗi gửi OTP: " + error.message);
+      console.error(error);
     });
 };
 
@@ -39,7 +52,7 @@ window.submitOtpFirebase = function () {
   confirmationResult.confirm(code)
     .then(() => {
       alert("✅ Xác minh OTP thành công!");
-      window.location.href = "/home";  // ✅ Sửa lại để chuyển đúng
+      window.location.href = "/home";
     })
     .catch((error) => {
       alert("❌ Sai mã OTP: " + error.message);
@@ -47,7 +60,7 @@ window.submitOtpFirebase = function () {
 };
 
 window.resendOtp = function () {
-  const phone = "{{ phone }}";
+  const phone = document.getElementById("phone-number")?.value || "{{ phone }}";
   sendOtpFirebase(phone);
   startResendCountdown();
 };
