@@ -64,3 +64,36 @@ window.verifyOtpFirebase = function (otpCode) {
       alert("❌ Lỗi xác minh OTP: " + error.message);
     });
 };
+
+window.submitOtpFirebase = function () {
+  const otpCode = document.getElementById("otp").value;
+  if (!otpCode) {
+    alert("⚠️ Bạn chưa nhập mã OTP.");
+    return;
+  }
+  verifyOtpFirebase(otpCode);  // Gọi đúng hàm đã viết sẵn
+};
+
+window.startResendCountdown = function () {
+  const resendBtn = document.getElementById("resend-btn");
+  let countdown = 60;
+  resendBtn.disabled = true;
+  resendBtn.innerText = `Gửi lại mã (${countdown}s)`;
+
+  const timer = setInterval(() => {
+    countdown--;
+    if (countdown <= 0) {
+      clearInterval(timer);
+      resendBtn.disabled = false;
+      resendBtn.innerText = "Gửi lại mã";
+    } else {
+      resendBtn.innerText = `Gửi lại mã (${countdown}s)`;
+    }
+  }, 1000);
+};
+
+window.resendOtp = function () {
+  sendOtpFirebase(phone);  // dùng biến toàn cục được khai báo từ verify.html
+  startResendCountdown();
+};
+
