@@ -284,7 +284,7 @@ def auth_usb():
         flash("✅ Xác thực Hardware Token thành công!", "success")
         return redirect(url_for("main.home"))
 
-    return render_template("auth_usb.html")
+    return render_template("verify_hard.html")
 
 
 
