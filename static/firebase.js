@@ -8,77 +8,59 @@ const firebaseConfig = {
   measurementId: "G-DEV70ZFQLW"
 };
 
+// Khởi tạo Firebase App
 firebase.initializeApp(firebaseConfig);
+
 const auth = firebase.auth();
 let confirmationResult = null;
-let countdownTimer = null;
 
-// ⚠️ Bắt buộc HTML phải có: <div id="recaptcha-container"></div>
-function initRecaptcha() {
-  if (!window.recaptchaVerifier) {
-    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-      size: 'invisible',
-      callback: function (response) {
-        console.log("reCAPTCHA resolved:", response);
-      }
-    });
-    window.recaptchaVerifier.render();
-  }
-}
-
+// Hàm gửi OTP
 window.sendOtpFirebase = function (phoneNumber) {
-  initRecaptcha();
-  const appVerifier = window.recaptchaVerifier;
+  // Xóa recaptcha cũ nếu có
+  if (window.recaptchaVerifier) {
+    window.recaptchaVerifier.clear();
+  }
 
-  auth.signInWithPhoneNumber(phoneNumber, appVerifier)
-    .then((result) => {
-      confirmationResult = result;
-      alert("✅ Mã OTP đã được gửi!");
-      startResendCountdown();
-    })
-    .catch((error) => {
-      alert("❌ Lỗi gửi OTP: " + error.message);
-      console.error(error);
-    });
+  // Tạo mới reCAPTCHA mỗi lần gửi
+  window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+    size: 'invisible',
+    callback: function (response) {
+      console.log("✅ reCAPTCHA passed:", response);
+    },
+    'expired-callback': function () {
+      console.warn("⚠️ reCAPTCHA expired. Need to reset.");
+    }
+  });
+
+  recaptchaVerifier.render().then(() => {
+    auth.signInWithPhoneNumber(phoneNumber, recaptchaVerifier)
+      .then((result) => {
+        confirmationResult = result;
+        window.confirmationResult = result;  // Lưu toàn cục
+        alert("✅ Mã OTP đã được gửi thành công!");
+      })
+      .catch((error) => {
+        console.error("❌ Lỗi gửi OTP:", error);
+        alert("❌ Lỗi gửi OTP: " + error.message);
+      });
+  });
 };
 
-window.submitOtpFirebase = function () {
-  const code = document.getElementById("otp").value;
-  if (!confirmationResult) {
-    alert("❗ Mã OTP chưa được gửi.");
+// Hàm xác minh OTP
+window.verifyOtpFirebase = function (otpCode) {
+  if (!window.confirmationResult) {
+    alert("⚠️ Chưa gửi OTP hoặc session đã hết hạn.");
     return;
   }
 
-  confirmationResult.confirm(code)
-    .then(() => {
-      alert("✅ Xác minh OTP thành công!");
-      window.location.href = "/home";
+  confirmationResult.confirm(otpCode)
+    .then((result) => {
+      const user = result.user;
+      alert("✅ Xác thực OTP thành công!");
+      console.log("Người dùng:", user);
     })
     .catch((error) => {
-      alert("❌ Sai mã OTP: " + error.message);
+      console.error("❌ Lỗi xác minh OTP:", error);
+      alert("❌ Lỗi xác minh OTP: " + error.message);
     });
 };
-
-window.resendOtp = function () {
-  const phone = document.getElementById("phone-number")?.value || "{{ phone }}";
-  sendOtpFirebase(phone);
-  startResendCountdown();
-};
-
-function startResendCountdown() {
-  const btn = document.getElementById("resend-btn");
-  let countdown = 60;
-  btn.disabled = true;
-  btn.textContent = `Gửi lại mã (${countdown}s)`;
-
-  countdownTimer = setInterval(() => {
-    countdown--;
-    btn.textContent = `Gửi lại mã (${countdown}s)`;
-
-    if (countdown === 0) {
-      clearInterval(countdownTimer);
-      btn.disabled = false;
-      btn.textContent = "Gửi lại mã";
-    }
-  }, 1000);
-}
