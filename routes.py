@@ -200,7 +200,7 @@ def auth_voice():
 
     print(f"[VOICE] Gửi OTP {otp} qua cuộc gọi tới số {user.phone}")
 
-    return render_template('verify.html',
+    return render_template('verify_voice.html',
                            header="Xác thực Voice",
                            message="OTP đã được gửi qua cuộc gọi giả lập. Nhấn nút 🔊 để nghe mã.",
                            verify_url=url_for('main.verify_voice'),
@@ -243,7 +243,7 @@ def auth_totp():
     qr_code_img = generate_qr_code(provisioning_uri)
     message = "Quét mã QR bằng Google Authenticator để thiết lập TOTP, sau đó nhập OTP bên dưới."
 
-    return render_template('verify.html',
+    return render_template('verify_soft.html',
                            header="Xác thực Software Token (TOTP)",
                            message=message,
                            qr_code=qr_code_img,

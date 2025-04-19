@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Xác thực TOTP</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style_modern.css') }}">
+</head>
+<body>
+  <div class="form-container">
+    <div class="form-card">
+      <div class="logo"><i class="fas fa-key"></i></div>
+      <h2>Xác thực TOTP</h2>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+      {% endwith %}
+
+      <p style="margin-bottom: 1rem;">{{ message|safe }}</p>
+
+      {% if qr_code %}
+        <div class="qr-container">
+          {{ qr_code|safe }}
+        </div>
+      {% endif %}
+
+      {% if verify_url != "#" %}
+        <form method="POST" action="{{ verify_url }}">
+          <div class="input-group">
+            <label for="otp">Nhập OTP:</label>
+            <input type="text" id="otp" name="otp" required>
+          </div>
+          <button type="submit" class="btn">Xác thực</button>
+        </form>
+      {% endif %}
+
+      <div class="link" style="margin-top: 1.5rem;">
+        <a href="{{ url_for('main.choose_method') }}">← Quay lại chọn phương thức</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
