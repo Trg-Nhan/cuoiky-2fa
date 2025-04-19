@@ -34,12 +34,12 @@
   </div>
 
   <script>
-    const phone = "{{ phone }}";
+    window.phone = "{{ phone }}";
     document.addEventListener("DOMContentLoaded", function () {
-      sendOtpFirebase(phone);
+      sendOtpFirebase(window.phone);
       startResendCountdown();
     });
   </script>
-
+  
 </body>
 </html>
