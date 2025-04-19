@@ -345,7 +345,7 @@ def auth_email():
 
     send_email_login_decision(user.email, username)
 
-    return render_template('verify.html',
+    return render_template('verify_push.html',
                            header="Xác thực qua Gmail",
                            message="Email xác thực đã được gửi đến hộp thư của bạn. Vui lòng kiểm tra và chọn xác nhận.",
                            verify_url="#")
