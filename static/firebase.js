@@ -1,83 +1,87 @@
+// Cấu hình Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDOR6ivLePyTR4j3HlHMyN-NB6QS-qSORk",
   authDomain: "sms-auth-demo-f5b14.firebaseapp.com",
   projectId: "sms-auth-demo-f5b14",
   storageBucket: "sms-auth-demo-f5b14.appspot.com",
   messagingSenderId: "194704028483",
-  appId: "1:194704028483:web:4c402376687e955bcbf5f6"
+  appId: "1:194704028483:web:4c402376687e955bcbf5f6",
+  measurementId: "G-DEV70ZFQLW"
 };
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
 let confirmationResult = null;
-let recaptchaVerifier = null;
-let countdownTimer = null;
+let resendTimer = null;
 
 function resetRecaptcha() {
-  if (recaptchaVerifier) {
-    recaptchaVerifier.clear();
+  if (window.recaptchaVerifier) {
+    try {
+      window.recaptchaVerifier.clear(); // 🔁 Reset lại reCAPTCHA nếu có
+    } catch (e) {
+      console.warn("Không thể clear reCAPTCHA:", e);
+    }
   }
+
   window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
     size: 'invisible'
   });
-  recaptchaVerifier = window.recaptchaVerifier;
-  recaptchaVerifier.render().then(widgetId => {
-    grecaptcha.reset(widgetId); // đảm bảo reset khi đổi số điện thoại
-  });
+
+  return window.recaptchaVerifier.render(); // Trả về promise
 }
 
 window.sendOtpFirebase = function (phoneNumber) {
-  resetRecaptcha(); // 🔁 Luôn reset reCAPTCHA mỗi lần gửi
+  resetRecaptcha().then(widgetId => {
+    window.recaptchaWidgetId = widgetId;
 
-  auth.signInWithPhoneNumber(phoneNumber, recaptchaVerifier)
-    .then(result => {
-      confirmationResult = result;
-      alert("✅ Mã OTP đã được gửi!");
-      startResendCountdown();
-    })
-    .catch(error => {
-      alert("❌ Lỗi gửi OTP: Firebase: " + error.message);
-      console.error(error);
-    });
+    auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
+      .then((result) => {
+        confirmationResult = result;
+        alert("✅ Mã OTP đã được gửi tới số " + phoneNumber);
+        startResendCountdown();  // nếu bạn có đồng hồ đếm ngược
+      })
+      .catch((error) => {
+        alert("❌ Lỗi gửi OTP: Firebase: " + error.message);
+        console.error(error);
+      });
+  });
 };
 
-window.submitOtpFirebase = function () {
-  const code = document.getElementById("otp").value;
+window.verifyOtpFirebase = function (otpCode) {
   if (!confirmationResult) {
-    alert("❗ Mã OTP chưa được gửi.");
+    alert("❗Bạn cần gửi OTP trước khi xác minh.");
     return;
   }
 
-  confirmationResult.confirm(code)
-    .then(() => {
-      alert("✅ Xác minh OTP thành công!");
-      window.location.href = "/home";
+  confirmationResult.confirm(otpCode)
+    .then((result) => {
+      alert("✅ Xác thực thành công!");
+      const user = result.user;
+      console.log("Logged in user:", user);
     })
-    .catch(error => {
-      alert("❌ Sai mã OTP: " + error.message);
+    .catch((error) => {
+      alert("❌ Sai mã OTP hoặc đã hết hạn: " + error.message);
     });
 };
 
-window.resendOtp = function () {
-  const phone = document.getElementById("phone").value || "{{ phone }}";
-  sendOtpFirebase(phone);
-};
-
+// ✅ Optional: Countdown để không spam OTP
 function startResendCountdown() {
-  const btn = document.getElementById("resend-btn");
-  let countdown = 60;
-  btn.disabled = true;
-  btn.textContent = `Gửi lại mã (${countdown}s)`;
+  const resendBtn = document.getElementById("resend-btn");
+  if (!resendBtn) return;
 
-  countdownTimer = setInterval(() => {
-    countdown--;
-    btn.textContent = `Gửi lại mã (${countdown}s)`;
+  let timeLeft = 60;
+  resendBtn.disabled = true;
+  resendBtn.innerText = `Gửi lại (${timeLeft}s)`;
 
-    if (countdown === 0) {
-      clearInterval(countdownTimer);
-      btn.disabled = false;
-      btn.textContent = "Gửi lại mã";
+  resendTimer = setInterval(() => {
+    timeLeft--;
+    if (timeLeft <= 0) {
+      clearInterval(resendTimer);
+      resendBtn.disabled = false;
+      resendBtn.innerText = "Gửi lại mã";
+    } else {
+      resendBtn.innerText = `Gửi lại (${timeLeft}s)`;
     }
   }, 1000);
 }
