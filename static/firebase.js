@@ -58,12 +58,16 @@ window.verifyOtpFirebase = function (otpCode) {
       const user = result.user;
       alert("✅ Xác thực OTP thành công!");
       console.log("Người dùng:", user);
+
+      // ✅ CHUYỂN TRANG về backend xử lý
+      window.location.href = "/auth/sms/verify";  // hoặc /home nếu bạn muốn vào thẳng trang chính
     })
     .catch((error) => {
       console.error("❌ Lỗi xác minh OTP:", error);
       alert("❌ Lỗi xác minh OTP: " + error.message);
     });
 };
+
 
 window.submitOtpFirebase = function () {
   const otpCode = document.getElementById("otp").value;
