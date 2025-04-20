@@ -240,8 +240,12 @@ def verify_voice():
    
 @bp.route('/voice_answer', methods=['POST'])
 def voice_answer():
+    from flask import jsonify, request
+
     data = request.json
     otp = data.get("user_data", "000000")
+
+    print("[VOICE_ANSWER] Nhận OTP:", otp)
 
     return jsonify({
         "actions": [
@@ -252,7 +256,7 @@ def voice_answer():
                 "language": "vi-VN"
             }
         ]
-    })
+    }), 200
 
 
 
