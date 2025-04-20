@@ -146,3 +146,54 @@ def send_email_login_decision(recipient_email, username):
         print(f"[EMAIL] Gửi link xác thực đến {recipient_email}")
     except Exception as e:
         print(f"[ERROR] Gửi email thất bại: {e}")
+
+
+#Voice-token
+def generate_stringee_signature(api_key_sid, api_key_secret):
+    import hmac, hashlib, base64, time, json
+
+    headers = {"typ": "JWT", "alg": "HS256"}
+    payload = {
+        "jti": api_key_sid,
+        "iss": api_key_sid,
+        "exp": int(time.time()) + 3600,
+        "userId": api_key_sid
+    }
+
+    def encode(obj):
+        return base64.urlsafe_b64encode(json.dumps(obj).encode()).rstrip(b'=')
+
+    header_enc = encode(headers)
+    payload_enc = encode(payload)
+    message = header_enc + b"." + payload_enc
+    signature = hmac.new(api_key_secret.encode(), message, hashlib.sha256).digest()
+    signature_enc = base64.urlsafe_b64encode(signature).rstrip(b'=')
+    return (message + b"." + signature_enc).decode()
+
+def send_voice_call_stringee(to_phone, otp):
+    api_sid = os.getenv("STRINGEE_API_SID")
+    api_secret = os.getenv("STRINGEE_API_SECRET")
+    project_id = os.getenv("STRINGEE_PROJECT_ID")
+    from_number = os.getenv("STRINGEE_FROM")
+    answer_url = os.getenv("STRINGEE_ANSWER_URL")
+
+    jwt_token = generate_stringee_signature(api_sid, api_secret)
+
+    payload = {
+        "from": from_number,
+        "to": to_phone,
+        "answer_url": answer_url,
+        "user_data": otp,
+        "app": {
+            "app_id": project_id
+        }
+    }
+
+    headers = {
+        "Content-Type": "application/json",
+        "X-STRINGEE-AUTH": jwt_token
+    }
+
+    response = requests.post("https://api.stringee.com/v1/call2/make_call", json=payload, headers=headers)
+    print(f"[Stringee] Gửi cuộc gọi tới {to_phone}, mã OTP: {otp}")
+    print(f"[Stringee] Phản hồi: {response.status_code} - {response.text}")
