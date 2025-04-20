@@ -157,7 +157,8 @@ def generate_stringee_signature(api_key_sid, api_key_secret):
         "jti": api_key_sid,
         "iss": api_key_sid,
         "exp": int(time.time()) + 3600,
-        "userId": api_key_sid
+        "userId": api_key_sid,
+        "rest_api": True  # ✅ BẮT BUỘC có dòng này
     }
 
     def encode(obj):
@@ -169,6 +170,7 @@ def generate_stringee_signature(api_key_sid, api_key_secret):
     signature = hmac.new(api_key_secret.encode(), message, hashlib.sha256).digest()
     signature_enc = base64.urlsafe_b64encode(signature).rstrip(b'=')
     return (message + b"." + signature_enc).decode()
+
 
 def send_voice_call_stringee(to_phone, otp):
     api_sid = os.getenv("STRINGEE_API_SID")
