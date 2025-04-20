@@ -2,38 +2,32 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Xác thực Voice</title>
+  <title>Xác thực bằng Cuộc Gọi</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style_modern.css') }}">
 </head>
-<body onload="speakOTP()">
+<body>
   <div class="form-container">
     <div class="form-card">
-      <div class="logo"><i class="fas fa-key"></i></div>
-      <h2>Xác thực Voice</h2>
+      <div class="logo">📞</div>
+      <h2>Xác thực bằng Cuộc Gọi</h2>
 
       {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert {{ category }}">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert {{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
       {% endwith %}
 
-      <p style="margin-bottom: 1rem;">
+      <p class="message">
         {{ message|safe }}
-        {% if otp_to_speak %}
-          <button type="button" onclick="speakOTP()" title="Nghe lại mã OTP"
-                  style="margin-left: 10px; background: none; border: none; cursor: pointer; font-size: 1.3rem;">
-            🔊
-          </button>
-        {% endif %}
       </p>
 
-      {% if verify_url != "#" %}
+      {% if verify_url %}
         <form method="POST" action="{{ verify_url }}">
           <div class="input-group">
-            <label for="otp">Nhập OTP:</label>
-            <input type="text" id="otp" name="otp" required>
+            <label for="otp">Nhập mã OTP bạn vừa nghe qua điện thoại:</label>
+            <input type="text" id="otp" name="otp" placeholder="Nhập mã OTP..." required>
           </div>
           <button type="submit" class="btn">Xác thực</button>
         </form>
@@ -44,19 +38,5 @@
       </div>
     </div>
   </div>
-
-  <script>
-    function speakOTP() {
-      const otp = "{{ otp_to_speak }}".split('').join(', ');
-      const msg = new SpeechSynthesisUtterance("Mã xác thực của bạn là: " + otp);
-      msg.lang = 'vi-VN';
-      msg.rate = 0.8;
-      window.speechSynthesis.speak(msg);
-    }
-  </script>
 </body>
 </html>
-
-
-
-
