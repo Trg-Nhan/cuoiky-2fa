@@ -12,6 +12,11 @@
             <h2>Đang chờ xác thực Hardware Token...</h2>
             <p>Vui lòng cắm USB và chạy chương trình <code>usb_auth.exe</code></p>
             <p>Trang này sẽ tự động chuyển hướng sau khi xác thực thành công.</p>
+
+            <!-- ✅ Đưa nút quay lại vào trong form-card -->
+            <div class="link" style="margin-top: 1.5rem;">
+                <a href="{{ url_for('main.choose_method') }}">← Quay lại chọn phương thức</a>
+            </div>
         </div>
     </div>
 
@@ -21,7 +26,7 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.verified) {
-                        window.location.href = "/auth/usb?verified=true"; // Gọi lại route để set session
+                        window.location.href = "/auth/usb?verified=true";
                     } else {
                         setTimeout(checkStatus, 2000);
                     }
@@ -29,9 +34,5 @@
         }
         checkStatus();
     </script>
-    <div class="link">
-        <a href="{{ url_for('main.choose_method') }}">← Quay lại chọn phương thức</a>
-      </div>
-      
 </body>
 </html>
