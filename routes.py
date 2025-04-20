@@ -12,6 +12,8 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 from flask import request, jsonify
+from utils import send_voice_call_stringee
+
 
 
 
@@ -190,33 +192,46 @@ def verify_sms():
 def auth_voice():
     if 'username' not in session:
         return redirect(url_for('main.login'))
-    otp = generate_otp()
-    session['otp_2fa'] = otp
+
     username = session['username']
     user = User.query.filter_by(username=username).first()
+
     if not user or not user.phone:
-        flash("Không tìm thấy số điện thoại của bạn. Vui lòng cập nhật thông tin.")
+        flash("Không tìm thấy số điện thoại của bạn.")
         return redirect(url_for('main.choose_method'))
 
-    print(f"[VOICE] Gửi OTP {otp} qua cuộc gọi tới số {user.phone}")
+    phone = user.phone.strip()
+    if phone.startswith("0"):
+        phone = "+84" + phone[1:]
+    elif not phone.startswith("+"):
+        phone = "+84" + phone
+
+    otp = generate_otp()
+    session['otp_2fa'] = otp
+
+    send_voice_call_stringee(phone, otp)
 
     return render_template('verify_voice.html',
-                           header="Xác thực Voice",
-                           message="OTP đã được gửi qua cuộc gọi giả lập. Nhấn nút 🔊 để nghe mã.",
-                           verify_url=url_for('main.verify_voice'),
-                           otp_to_speak=otp)  # truyền vào để giao diện có thể đọc
+                           header="Xác thực bằng cuộc gọi",
+                           message=f"Mã OTP đang được đọc qua số điện thoại: {phone}",
+                           verify_url=url_for('main.verify_voice'))
+   
+@bp.route('/voice_answer', methods=['POST'])
+def voice_answer():
+    data = request.json
+    otp = data.get("user_data", "000000")
 
-@bp.route('/auth/voice/verify', methods=['POST'])
-def verify_voice():
-    if 'username' not in session:
-        return redirect(url_for('main.login'))
-    otp_input = request.form.get('otp')
-    if otp_input == session.get('otp_2fa'):
-        session.pop('otp_2fa', None)
-        flash("Xác thực 2FA thành công!")
-        return redirect(url_for('main.home'))
-    flash("OTP Voice không hợp lệ!")
-    return redirect(url_for('main.choose_method'))
+    return jsonify({
+        "actions": [
+            {
+                "action": "talk",
+                "text": f"Mã xác thực của bạn là: {' '.join(otp)}",
+                "voice": "female",
+                "language": "vi-VN"
+            }
+        ]
+    })
+
 
 
 #APP Token
@@ -286,10 +301,6 @@ def auth_usb():
 
     return render_template("verify_hard.html")
 
-
-
-
-
 @bp.route('/verify_usb_token', methods=['POST'])
 def verify_usb_token():
     token = request.json.get("token")
@@ -319,8 +330,8 @@ def logout():
     flash("Bạn đã đăng xuất.")
     return redirect(url_for('main.login'))
 
-@bp.route('/voice_token_simulation')
-def voice_token_simulation():
+#@bp.route('/voice_token_simulation')
+#def voice_token_simulation():
     otp = generate_otp()
     session['otp_voice'] = otp
     return render_template('verify.html',
