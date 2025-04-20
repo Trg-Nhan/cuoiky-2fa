@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 load_dotenv()
 from flask import request, jsonify
 from utils import send_voice_call_stringee
-
+from flask import make_response
 
 
 
@@ -240,8 +240,6 @@ def verify_voice():
    
 @bp.route('/voice_answer', methods=['POST'])
 def voice_answer():
-    from flask import jsonify, request, make_response
-
     data = request.get_json()
     otp = data.get("user_data", "000000")
     print("[VOICE_ANSWER] Nhận OTP:", otp)
@@ -257,7 +255,6 @@ def voice_answer():
         ]
     }
 
-    # Đảm bảo header JSON đúng
     response = make_response(jsonify(response_data), 200)
     response.headers['Content-Type'] = 'application/json'
     return response
