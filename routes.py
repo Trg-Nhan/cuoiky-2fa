@@ -215,6 +215,20 @@ def auth_voice():
                            header="Xác thực bằng cuộc gọi",
                            message=f"Mã OTP đang được đọc qua số điện thoại: {phone}",
                            verify_url=url_for('main.verify_voice'))
+
+@bp.route('/auth/voice/verify', methods=['POST'])
+def verify_voice():
+    if 'username' not in session:
+        return redirect(url_for('main.login'))
+
+    otp_input = request.form.get('otp')
+    if otp_input == session.get('otp_2fa'):
+        session.pop('otp_2fa', None)
+        flash("✅ Xác thực Voice Token thành công!")
+        return redirect(url_for('main.home'))
+
+    flash("❌ Mã OTP không đúng.")
+    return redirect(url_for('main.choose_method'))
    
 @bp.route('/voice_answer', methods=['POST'])
 def voice_answer():
