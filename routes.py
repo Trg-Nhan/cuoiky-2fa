@@ -219,16 +219,24 @@ def auth_voice():
 @bp.route('/auth/voice/verify', methods=['POST'])
 def verify_voice():
     if 'username' not in session:
+        flash("Bạn chưa đăng nhập.")
         return redirect(url_for('main.login'))
 
-    otp_input = request.form.get('otp')
-    if otp_input == session.get('otp_2fa'):
-        session.pop('otp_2fa', None)
+    user_input_otp = request.form.get('otp')
+    otp_expected = session.get('otp_2fa')
+
+    if not otp_expected:
+        flash("Mã OTP đã hết hạn hoặc chưa được tạo. Vui lòng thử lại.")
+        return redirect(url_for('main.auth_voice'))
+
+    if user_input_otp == otp_expected:
+        session.pop('otp_2fa', None)  # Xóa OTP sau khi xác thực
         flash("✅ Xác thực Voice Token thành công!")
         return redirect(url_for('main.home'))
+    else:
+        flash("❌ Mã OTP không đúng, vui lòng thử lại.")
+        return redirect(url_for('main.auth_voice'))
 
-    flash("❌ Mã OTP không đúng.")
-    return redirect(url_for('main.choose_method'))
    
 @bp.route('/voice_answer', methods=['POST'])
 def voice_answer():
