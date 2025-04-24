@@ -10,6 +10,15 @@ import base64
 from markupsafe import Markup
 import requests
 import os
+from dotenv import load_dotenv
+import os
+import requests
+import json
+from dotenv import load_dotenv
+import os
+import requests
+
+load_dotenv()
 
 
 def generate_otp():
@@ -173,29 +182,26 @@ def send_email_login_decision(recipient_email, username):
 
 
 def send_voice_call_stringee(to_phone, otp):
-    import os
-    import requests
-    import json
+    rest_token = os.getenv("STRINGEE_REST_TOKEN")
+    from_number = os.getenv("STRINGEE_FROM")
 
-    jwt_token = os.getenv("STRINGEE_REST_TOKEN", "").strip()
-    from_number = os.getenv("STRINGEE_FROM", "").strip()
-
-    otp_str = str(otp)
     payload = {
         "from": {
             "type": "external",
             "number": from_number,
             "alias": "Xac thuc"
         },
-        "to": [{
-            "type": "external",
-            "number": to_phone,
-            "alias": "Ban"
-        }],
+        "to": [
+            {
+                "type": "external",
+                "number": to_phone,
+                "alias": "Ban"
+            }
+        ],
         "actions": [
             {
                 "action": "talk",
-                "text": f"Ma xac thuc cua ban la {' '.join(otp_str)}",
+                "text": f"Ma xac thuc cua ban la {' '.join(otp)}",
                 "voice": "female",
                 "language": "vi-VN"
             }
@@ -204,10 +210,12 @@ def send_voice_call_stringee(to_phone, otp):
 
     headers = {
         "Content-Type": "application/json",
-        "X-STRINGEE-AUTH": jwt_token
+        "X-STRINGEE-AUTH": rest_token.strip()
     }
 
-    response = requests.post("https://api.stringee.com/v1/call2/callout", json=payload, headers=headers)
-
-    print(f"[Stringee] Gửi cuộc gọi tới {to_phone}, mã OTP: {otp}")
-    print(f"[Stringee] Phản hồi: {response.status_code} - {response.text}")
+    try:
+        response = requests.post("https://api.stringee.com/v1/call2/callout", json=payload, headers=headers)
+        print(f"[Stringee] Gửi cuộc gọi tới {to_phone}, mã OTP: {otp}")
+        print(f"[Stringee] Phản hồi: {response.status_code} - {response.text}")
+    except Exception as e:
+        print(f"[Stringee] Lỗi gửi cuộc gọi: {str(e)}")
