@@ -149,27 +149,27 @@ def send_email_login_decision(recipient_email, username):
 
 
 #Voice-token
-def generate_stringee_signature(api_key_sid, api_key_secret):
-    import hmac, hashlib, base64, time, json
+# def generate_stringee_signature(api_key_sid, api_key_secret):
+#     import hmac, hashlib, base64, time, json
 
-    headers = {"typ": "JWT", "alg": "HS256"}
-    payload = {
-        "jti": api_key_sid,
-        "iss": api_key_sid,
-        "exp": int(time.time()) + 3600,
-        "userId": api_key_sid,
-        "rest_api": True  # ✅ BẮT BUỘC có dòng này
-    }
+#     headers = {"typ": "JWT", "alg": "HS256"}
+#     payload = {
+#         "jti": api_key_sid,
+#         "iss": api_key_sid,
+#         "exp": int(time.time()) + 3600,
+#         "userId": api_key_sid,
+#         "rest_api": True  # ✅ BẮT BUỘC có dòng này
+#     }
 
-    def encode(obj):
-        return base64.urlsafe_b64encode(json.dumps(obj).encode()).rstrip(b'=')
+#     def encode(obj):
+#         return base64.urlsafe_b64encode(json.dumps(obj).encode()).rstrip(b'=')
 
-    header_enc = encode(headers)
-    payload_enc = encode(payload)
-    message = header_enc + b"." + payload_enc
-    signature = hmac.new(api_key_secret.encode(), message, hashlib.sha256).digest()
-    signature_enc = base64.urlsafe_b64encode(signature).rstrip(b'=')
-    return (message + b"." + signature_enc).decode()
+#     header_enc = encode(headers)
+#     payload_enc = encode(payload)
+#     message = header_enc + b"." + payload_enc
+#     signature = hmac.new(api_key_secret.encode(), message, hashlib.sha256).digest()
+#     signature_enc = base64.urlsafe_b64encode(signature).rstrip(b'=')
+#     return (message + b"." + signature_enc).decode()
 
 
 def send_voice_call_stringee(to_phone, otp):
@@ -177,9 +177,10 @@ def send_voice_call_stringee(to_phone, otp):
     import json
     import requests
 
-    jwt_token = os.getenv("STRINGEE_REST_TOKEN")  # Bạn lưu token curl ở đây
+    jwt_token = os.getenv("STRINGEE_REST_TOKEN")
     from_number = os.getenv("STRINGEE_FROM")
 
+    otp_str = str(otp)  # 🔥 Quan trọng: đảm bảo luôn là chuỗi
     payload = {
         "from": {
             "type": "external",
@@ -194,7 +195,7 @@ def send_voice_call_stringee(to_phone, otp):
         "actions": [
             {
                 "action": "talk",
-                "text": f"Ma xac thuc cua ban la {' '.join(otp)}",
+                "text": f"Ma xac thuc cua ban la {' '.join(otp_str)}",
                 "voice": "female",
                 "language": "vi-VN"
             }
