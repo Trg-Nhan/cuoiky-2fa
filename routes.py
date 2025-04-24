@@ -242,22 +242,23 @@ def verify_voice():
 def voice_answer():
     data = request.get_json()
     otp = data.get("user_data", "000000")
-    print("[VOICE_ANSWER] Nhận OTP:", otp)
+
+    # Chuyển từng số thành chuỗi cách nhau để dễ nghe
+    otp_spaced = ' '.join(otp)
 
     response_data = {
         "actions": [
             {
                 "action": "talk",
-                "text": f"Mã xác thực của bạn là: {' '.join(otp)}",
+                "text": f"Mã xác thực của bạn là: {otp_spaced}",
                 "voice": "female",
                 "language": "vi-VN"
             }
         ]
     }
 
-    response = make_response(jsonify(response_data), 200)
-    response.headers['Content-Type'] = 'application/json'
-    return response
+    return jsonify(response_data), 200
+
 
 
 
