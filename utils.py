@@ -199,3 +199,5 @@ def send_voice_call_stringee(to_phone, otp):
     response = requests.post("https://api.stringee.com/v1/call2/make_call", json=payload, headers=headers)
     print(f"[Stringee] Gửi cuộc gọi tới {to_phone}, mã OTP: {otp}")
     print(f"[Stringee] Phản hồi: {response.status_code} - {response.text}")
+    print(f"[DEBUG] answer_url = {answer_url}")
+
