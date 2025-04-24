@@ -240,10 +240,12 @@ def verify_voice():
    
 @bp.route('/voice_answer', methods=['POST'])
 def voice_answer():
+    from flask import make_response
+    import json
+
     data = request.get_json()
     otp = data.get("user_data", "000000")
 
-    # Chuyển từng số thành chuỗi cách nhau để dễ nghe
     otp_spaced = ' '.join(otp)
 
     response_data = {
@@ -257,8 +259,10 @@ def voice_answer():
         ]
     }
 
-    return jsonify(response_data), 200
-
+    # 👉 Trả về response đúng MIME: application/json
+    response = make_response(json.dumps(response_data), 200)
+    response.headers['Content-Type'] = 'application/json'
+    return response
 
 
 
