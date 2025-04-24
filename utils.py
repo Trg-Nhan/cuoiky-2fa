@@ -174,13 +174,13 @@ def send_email_login_decision(recipient_email, username):
 
 def send_voice_call_stringee(to_phone, otp):
     import os
-    import json
     import requests
+    import json
 
-    jwt_token = os.getenv("STRINGEE_REST_TOKEN")
-    from_number = os.getenv("STRINGEE_FROM")
+    jwt_token = os.getenv("STRINGEE_REST_TOKEN", "").strip()
+    from_number = os.getenv("STRINGEE_FROM", "").strip()
 
-    otp_str = str(otp)  # 🔥 Quan trọng: đảm bảo luôn là chuỗi
+    otp_str = str(otp)
     payload = {
         "from": {
             "type": "external",
@@ -190,7 +190,7 @@ def send_voice_call_stringee(to_phone, otp):
         "to": [{
             "type": "external",
             "number": to_phone,
-            "alias": "Nguoi dung"
+            "alias": "Ban"
         }],
         "actions": [
             {
@@ -208,5 +208,6 @@ def send_voice_call_stringee(to_phone, otp):
     }
 
     response = requests.post("https://api.stringee.com/v1/call2/callout", json=payload, headers=headers)
+
     print(f"[Stringee] Gửi cuộc gọi tới {to_phone}, mã OTP: {otp}")
     print(f"[Stringee] Phản hồi: {response.status_code} - {response.text}")
