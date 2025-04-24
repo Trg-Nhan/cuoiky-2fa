@@ -173,28 +173,28 @@ def generate_stringee_signature(api_key_sid, api_key_secret):
 
 
 def send_voice_call_stringee(to_phone, otp):
+    import os
     import json
-    api_sid = os.getenv("STRINGEE_API_SID")
-    api_secret = os.getenv("STRINGEE_API_SECRET")
-    from_number = os.getenv("STRINGEE_FROM")
+    import requests
 
-    jwt_token = generate_stringee_signature(api_sid, api_secret)
+    jwt_token = os.getenv("STRINGEE_REST_TOKEN")  # Bạn lưu token curl ở đây
+    from_number = os.getenv("STRINGEE_FROM")
 
     payload = {
         "from": {
             "type": "external",
             "number": from_number,
-            "alias": "2FA-WebApp"
+            "alias": "Xac thuc"
         },
         "to": [{
             "type": "external",
             "number": to_phone,
-            "alias": "User"
+            "alias": "Nguoi dung"
         }],
         "actions": [
             {
                 "action": "talk",
-                "text": f"Ma xac thuc cua ban la {' '.join(str(otp))}",
+                "text": f"Ma xac thuc cua ban la {' '.join(otp)}",
                 "voice": "female",
                 "language": "vi-VN"
             }
