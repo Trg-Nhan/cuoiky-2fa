@@ -194,7 +194,7 @@ def send_voice_call_stringee(to_phone, otp):
         "actions": [
             {
                 "action": "talk",
-                "text": f"Mã xác thực của bạn là: {' '.join(otp)}",
+                "text": f"Ma xac thuc cua ban la {' '.join(str(otp))}",
                 "voice": "female",
                 "language": "vi-VN"
             }
