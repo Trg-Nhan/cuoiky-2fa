@@ -14,6 +14,7 @@ load_dotenv()
 from flask import request, jsonify
 from utils import send_voice_call_stringee
 from flask import make_response
+from flask import request, jsonify, make_response
 
 
 
@@ -240,29 +241,22 @@ def verify_voice():
    
 @bp.route('/voice_answer', methods=['POST'])
 def voice_answer():
-    from flask import make_response
-    import json
-
     data = request.get_json()
     otp = data.get("user_data", "000000")
-
-    otp_spaced = ' '.join(otp)
+    print("[VOICE_ANSWER] Nhận OTP:", otp)
 
     response_data = {
         "actions": [
             {
                 "action": "talk",
-                "text": f"Mã xác thực của bạn là: {otp_spaced}",
+                "text": f"Mã xác thực của bạn là: {' '.join(otp)}",
                 "voice": "female",
                 "language": "vi-VN"
             }
         ]
     }
 
-    # 👉 Trả về response đúng MIME: application/json
-    response = make_response(json.dumps(response_data), 200)
-    response.headers['Content-Type'] = 'application/json'
-    return response
+    return make_response(jsonify(response_data), 200)
 
 
 
