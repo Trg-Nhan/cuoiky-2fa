@@ -239,10 +239,9 @@ def verify_voice():
         return redirect(url_for('main.auth_voice'))
 
    
-@bp.route('/voice_answer', methods=['POST'])
+@bp.route('/voice_answer', methods=['GET', 'POST'])
 def voice_answer():
-    data = request.get_json()
-    otp = data.get("user_data", "000000")
+    otp = request.args.get("user_data") or request.get_json().get("user_data", "000000")
     print("[VOICE_ANSWER] Nhận OTP:", otp)
 
     response_data = {
@@ -257,7 +256,6 @@ def voice_answer():
     }
 
     return make_response(jsonify(response_data), 200)
-
 
 
 #APP Token
