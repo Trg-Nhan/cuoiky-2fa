@@ -173,22 +173,32 @@ def generate_stringee_signature(api_key_sid, api_key_secret):
 
 
 def send_voice_call_stringee(to_phone, otp):
+    import json
     api_sid = os.getenv("STRINGEE_API_SID")
     api_secret = os.getenv("STRINGEE_API_SECRET")
-    project_id = os.getenv("STRINGEE_PROJECT_ID")
     from_number = os.getenv("STRINGEE_FROM")
-    answer_url = os.getenv("STRINGEE_ANSWER_URL")
 
     jwt_token = generate_stringee_signature(api_sid, api_secret)
 
     payload = {
-        "from": from_number,
-        "to": to_phone,
-        "answer_url": answer_url,
-        "user_data": otp,
-        "app": {
-            "app_id": project_id
-        }
+        "from": {
+            "type": "external",
+            "number": from_number,
+            "alias": "2FA-WebApp"
+        },
+        "to": [{
+            "type": "external",
+            "number": to_phone,
+            "alias": "User"
+        }],
+        "actions": [
+            {
+                "action": "talk",
+                "text": f"Mã xác thực của bạn là: {' '.join(otp)}",
+                "voice": "female",
+                "language": "vi-VN"
+            }
+        ]
     }
 
     headers = {
@@ -196,8 +206,6 @@ def send_voice_call_stringee(to_phone, otp):
         "X-STRINGEE-AUTH": jwt_token
     }
 
-    response = requests.post("https://api.stringee.com/v1/call2/makecall", json=payload, headers=headers)
+    response = requests.post("https://api.stringee.com/v1/call2/callout", json=payload, headers=headers)
     print(f"[Stringee] Gửi cuộc gọi tới {to_phone}, mã OTP: {otp}")
     print(f"[Stringee] Phản hồi: {response.status_code} - {response.text}")
-    print(f"[DEBUG] answer_url = {answer_url}")
-
