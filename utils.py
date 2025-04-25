@@ -181,12 +181,12 @@ def send_email_login_decision(recipient_email, username):
 #     return (message + b"." + signature_enc).decode()
 
 
-def send_voice_call_stringee(to_phone):
+def send_voice_call_stringee(to_phone, otp):
     url = "https://api.stringee.com/v1/call2/callout"
 
     headers = {
         "Content-Type": "application/json",
-        "X-STRINGEE-AUTH": "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTSy4wLjJ0ZUJFczRYVDgyUGJ6VHk5YnJQVmFTN281WFo0ejNQLTE3NDU1MTA5MzEiLCJpc3MiOiJTSy4wLjJ0ZUJFczRYVDgyUGJ6VHk5YnJQVmFTN281WFo0ejNQIiwiZXhwIjoxNzQ1NTU0MTMxLCJyZXN0X2FwaSI6dHJ1ZX0.dG5CD_Djcl3aVIjLqHPbucWci0OKDXpqpE8lW328tqk"
+        "X-STRINGEE-AUTH": os.getenv("STRINGEE_REST_TOKEN").strip()
     }
 
     payload = {
@@ -205,7 +205,7 @@ def send_voice_call_stringee(to_phone):
         "actions": [
             {
                 "action": "talk",
-                "text": "Ma xac thuc cua ban la 1 2 3 4 5 6",
+                "text": f"Ma xac thuc cua ban la {' '.join(otp)}",
                 "voice": "female",
                 "language": "vi-VN"
             }
@@ -214,7 +214,7 @@ def send_voice_call_stringee(to_phone):
 
     try:
         response = requests.post(url, json=payload, headers=headers)
-        print(f"[Stringee] Trạng thái: {response.status_code}")
-        print(f"[Stringee] Nội dung: {response.text}")
+        print(f"[Stringee] Gửi cuộc gọi tới {to_phone}, mã OTP: {otp}")
+        print(f"[Stringee] Phản hồi: {response.status_code} - {response.text}")
     except Exception as e:
-        print(f"[Stringee] Lỗi gửi yêu cầu: {e}")
+        print(f"[Stringee] Lỗi gửi cuộc gọi: {str(e)}")
