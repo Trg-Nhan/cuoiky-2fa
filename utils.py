@@ -181,14 +181,18 @@ def send_email_login_decision(recipient_email, username):
 #     return (message + b"." + signature_enc).decode()
 
 
-def send_voice_call_stringee(to_phone, otp):
-    rest_token = os.getenv("STRINGEE_REST_TOKEN")
-    from_number = os.getenv("STRINGEE_FROM")
+def send_voice_call_stringee(to_phone):
+    url = "https://api.stringee.com/v1/call2/callout"
+
+    headers = {
+        "Content-Type": "application/json",
+        "X-STRINGEE-AUTH": "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTSy4wLjJ0ZUJFczRYVDgyUGJ6VHk5YnJQVmFTN281WFo0ejNQLTE3NDU1MTA5MzEiLCJpc3MiOiJTSy4wLjJ0ZUJFczRYVDgyUGJ6VHk5YnJQVmFTN281WFo0ejNQIiwiZXhwIjoxNzQ1NTU0MTMxLCJyZXN0X2FwaSI6dHJ1ZX0.dG5CD_Djcl3aVIjLqHPbucWci0OKDXpqpE8lW328tqk"
+    }
 
     payload = {
         "from": {
             "type": "external",
-            "number": from_number,
+            "number": "842873018880",
             "alias": "Xac thuc"
         },
         "to": [
@@ -201,21 +205,16 @@ def send_voice_call_stringee(to_phone, otp):
         "actions": [
             {
                 "action": "talk",
-                "text": f"Ma xac thuc cua ban la {' '.join(otp)}",
+                "text": "Ma xac thuc cua ban la 1 2 3 4 5 6",
                 "voice": "female",
                 "language": "vi-VN"
             }
         ]
     }
 
-    headers = {
-        "Content-Type": "application/json",
-        "X-STRINGEE-AUTH": rest_token.strip()
-    }
-
     try:
-        response = requests.post("https://api.stringee.com/v1/call2/callout", json=payload, headers=headers)
-        print(f"[Stringee] Gửi cuộc gọi tới {to_phone}, mã OTP: {otp}")
-        print(f"[Stringee] Phản hồi: {response.status_code} - {response.text}")
+        response = requests.post(url, json=payload, headers=headers)
+        print(f"[Stringee] Trạng thái: {response.status_code}")
+        print(f"[Stringee] Nội dung: {response.text}")
     except Exception as e:
-        print(f"[Stringee] Lỗi gửi cuộc gọi: {str(e)}")
+        print(f"[Stringee] Lỗi gửi yêu cầu: {e}")
